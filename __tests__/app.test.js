@@ -31,7 +31,7 @@ describe("/api/categories", () => {
 			.get("/api/categories/")
 			.expect(200)
 			.then((result) => {
-				expect(result.body.length > 0);
+				expect(result.body.categories.length > 0).toBe(true);
 				result.body.categories.forEach((category) => {
 					expect(category).toMatchObject({
 						slug: expect.any(String),
@@ -47,7 +47,10 @@ describe("/api/reviews", () => {
 			.get("/api/reviews/")
 			.expect(200)
 			.then((result) => {
-				expect(result.body.length > 0);
+				expect(result.body.reviews.length > 0).toBe(true);
+				expect(result.body.reviews).toBeSortedBy("created_at", {
+					descending: true,
+				});
 				result.body.reviews.forEach((review) => {
 					expect(review).toMatchObject({
 						owner: expect.any(String),
@@ -58,11 +61,12 @@ describe("/api/reviews", () => {
 						created_at: expect.any(String),
 						votes: expect.any(Number),
 						designer: expect.any(String),
+						comment_count: expect.any(Number),
 					});
 				});
 			});
 	});
-	test("output should be in decending order of date", () => {
+	/* test("output should be in decending order of date", () => {
 		return request(app)
 			.get("/api/reviews/")
 			.expect(200)
@@ -71,5 +75,5 @@ describe("/api/reviews", () => {
 					descending: true,
 				});
 			});
-	});
+	}); */
 });
