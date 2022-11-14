@@ -12,22 +12,7 @@ beforeEach(() => {
 	return seed(data);
 });
 
-describe("/api/categories", () => {
-	test("GET 200 - should return with all the categories", () => {
-		return request(app)
-			.get("/api/categories/")
-			.expect(200)
-			.then((result) => {
-				expect(
-					result.body.categories.forEach((category) => {
-						expect(category).toMatchObject({
-							slug: expect.any(String),
-							description: expect.any(String),
-						});
-					})
-				);
-			});
-	});
+describe("/api/", () => {
 	test("GET 404 - route not found", () => {
 		return request(app)
 			.get("/api/notValidRoute")
@@ -35,6 +20,22 @@ describe("/api/categories", () => {
 			.then((result) => {
 				expect(result.body).toMatchObject({
 					msg: "Sorry, route not found :(",
+				});
+			});
+	});
+});
+describe("/api/categories", () => {
+	test("GET 200 - should return with all the categories", () => {
+		return request(app)
+			.get("/api/categories/")
+			.expect(200)
+			.then((result) => {
+				expect(result.body.length > 0);
+				result.body.categories.forEach((category) => {
+					expect(category).toMatchObject({
+						slug: expect.any(String),
+						description: expect.any(String),
+					});
 				});
 			});
 	});
