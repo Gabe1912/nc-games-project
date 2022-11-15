@@ -66,14 +66,4 @@ describe("/api/reviews", () => {
 				});
 			});
 	});
-	/* test("output should be in decending order of date", () => {
-		return request(app)
-			.get("/api/reviews/")
-			.expect(200)
-			.then((res) => {
-				expect(res.body.reviews).toBeSortedBy("created_at", {
-					descending: true,
-				});
-			});
-	}); */
 });
