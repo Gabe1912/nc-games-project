@@ -42,7 +42,7 @@ describe("/api/categories", () => {
 	});
 });
 describe("/api/reviews", () => {
-	test("GET 200 - should return with all the reviews", () => {
+	test("GET 200 - should return with all the reviews in decending order of date", () => {
 		return request(app)
 			.get("/api/reviews/")
 			.expect(200)
@@ -66,14 +66,4 @@ describe("/api/reviews", () => {
 				});
 			});
 	});
-	/* test("output should be in decending order of date", () => {
-		return request(app)
-			.get("/api/reviews/")
-			.expect(200)
-			.then((res) => {
-				expect(res.body.reviews).toBeSortedBy("created_at", {
-					descending: true,
-				});
-			});
-	}); */
 });
