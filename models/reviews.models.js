@@ -19,6 +19,27 @@ exports.selectReviews = () => {
 		.then((reviews) => reviews.rows);
 };
 
-exports.selectReviewsByID = (review_id) => {
-	return db.query().then((review) => review.rows[0]);
+exports.selectReviewByID = (review_id) => {
+	if (review_id === undefined) {
+		return Promise.reject({
+			status: 400,
+			msg: `Sorry, that's a bad request`,
+		});
+	}
+	return db
+		.query(
+			`SELECT * FROM reviews
+        WHERE review_id = $1`,
+			[review_id]
+		)
+		.then((review) => {
+			const result = review.rows[0];
+			if (result === undefined) {
+				return Promise.reject({
+					status: 404,
+					msg: `Sorry, that review does not exist`,
+				});
+			}
+			return result;
+		});
 };

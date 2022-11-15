@@ -1,7 +1,4 @@
-const {
-	selectReviews,
-	selectReviewsByID,
-} = require("../models/reviews.models");
+const { selectReviews, selectReviewByID } = require("../models/reviews.models");
 
 exports.getReviews = (req, res) => {
 	selectReviews(req.body).then((reviews) => {
@@ -9,8 +6,10 @@ exports.getReviews = (req, res) => {
 	});
 };
 
-exports.getReviewsByID = (req, res) => {
-	selectReviewsByID(req.params.review_id).then((review) => {
-		res.status(200).send({ review });
-	});
+exports.getReviewByID = (req, res, next) => {
+	selectReviewByID(req.params.review_id)
+		.then((review) => {
+			res.status(200).send({ review });
+		})
+		.catch(next);
 };
