@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkReviewExists } = require("../utils");
 
 exports.selectReviews = () => {
 	return db
@@ -39,4 +40,16 @@ exports.selectReviewByID = (review_id) => {
 			}
 			return result;
 		});
+};
+
+exports.selectComments = (review_id) => {
+	return checkReviewExists(review_id).then(() => {
+		return db
+			.query(
+				`SELECT * FROM comments
+        WHERE review_id = $1`,
+				[review_id]
+			)
+			.then((comments) => comments.rows);
+	});
 };

@@ -4,12 +4,11 @@ const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
 
-afterAll(() => {
-	return db.end();
-});
-
 beforeEach(() => {
 	return seed(data);
+});
+afterAll(() => {
+	return db.end();
 });
 
 describe("/api/", () => {
@@ -24,7 +23,6 @@ describe("/api/", () => {
 			});
 	});
 });
-
 describe("/api/categories", () => {
 	test("GET 200 - should return with all the categories", () => {
 		return request(app)
@@ -66,10 +64,9 @@ describe("/api/reviews", () => {
 				});
 			});
 	});
-
 });
 describe("/api/reviews/:review_id", () => {
-	test("GET 200 - should return an object of the relevant ", () => {
+	test("GET 200 - should return an object of the relevant review", () => {
 		const output = {
 			review_id: 1,
 			title: "Agricola",
@@ -89,6 +86,14 @@ describe("/api/reviews/:review_id", () => {
 				expect(result.body).toEqual({ review: output });
 			});
 	});
+	test("GET 400 - should return error message if given an invalid id", () => {
+		return request(app)
+			.get("/api/reviews/not-a-review")
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+			});
+	});
 	test("GET 404 - should return error if given valid id that doesn't exist", () => {
 		return request(app)
 			.get("/api/reviews/9999")
@@ -97,12 +102,56 @@ describe("/api/reviews/:review_id", () => {
 				expect(result.body.msg).toBe("Sorry, that review does not exist");
 			});
 	});
+});
+describe("/api/reviews/:review_id/comments", () => {
+	test("GET 200 - should return an object of the relevant review's comments", () => {
+		const output = [
+			{
+				comment_id: 1,
+				body: "I loved this game too!",
+				votes: 16,
+				author: "bainesface",
+				review_id: 2,
+				created_at: "2017-11-22T12:43:33.389Z",
+			},
+			{
+				comment_id: 4,
+				body: "EPIC board game!",
+				votes: 16,
+				author: "bainesface",
+				review_id: 2,
+				created_at: "2017-11-22T12:36:03.389Z",
+			},
+			{
+				comment_id: 5,
+				body: "Now this is a story all about how, board games turned my life upside down",
+				votes: 13,
+				author: "mallionaire",
+				review_id: 2,
+				created_at: "2021-01-18T10:24:05.410Z",
+			},
+		];
+		return request(app)
+			.get("/api/reviews/2/comments")
+			.expect(200)
+			.then((result) => {
+				expect(result.body).toEqual({ comments: output });
+			});
+	});
 	test("GET 400 - should return error message if given an invalid id", () => {
 		return request(app)
-			.get("/api/reviews/not-a-review")
+			.get("/api/reviews/not-a-review/comments")
 			.expect(400)
 			.then((result) => {
 				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+			});
+	});
+	test("GET 404 - should return error if given valid id that doesn't exist", () => {
+		return request(app)
+			.get("/api/reviews/9999/comments")
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that review does not exist");
 			});
 	});
 });
