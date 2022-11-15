@@ -4,12 +4,11 @@ const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
 
-afterAll(() => {
-	return db.end();
-});
-
 beforeEach(() => {
 	return seed(data);
+});
+afterAll(() => {
+	return db.end();
 });
 
 describe("/api/", () => {
@@ -24,7 +23,6 @@ describe("/api/", () => {
 			});
 	});
 });
-
 describe("/api/categories", () => {
 	test("GET 200 - should return with all the categories", () => {
 		return request(app)
@@ -66,5 +64,78 @@ describe("/api/reviews", () => {
 				});
 			});
 	});
+});
+describe("/api/reviews/:review_id", () => {
+	test("GET 200 - should return an object of the relevant review", () => {
+		return request(app)
+			.get("/api/reviews/1")
+			.expect(200)
+			.then((result) => {
+				expect(result.body).toMatchObject({
+					review: {
+						review_id: expect.any(Number),
+						title: expect.any(String),
+						designer: expect.any(String),
+						owner: expect.any(String),
+						review_img_url: expect.any(String),
+						review_body: expect.any(String),
+						category: expect.any(String),
+						created_at: expect.any(String),
+						votes: expect.any(Number),
+					},
+				});
+			});
+	});
+	test("GET 400 - should return error message if given an invalid id", () => {
+		return request(app)
+			.get("/api/reviews/not-a-review")
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+			});
+	});
+	test("GET 404 - should return error if given valid id that doesn't exist", () => {
+		return request(app)
+			.get("/api/reviews/9999")
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that review does not exist");
+			});
+	});
+});
+describe("/api/reviews/:review_id/comments", () => {
+	test("GET 200 - should return an object of the relevant review's comments", () => {
+		return request(app)
+			.get("/api/reviews/2/comments")
+			.expect(200)
+			.then((result) => {
+				result.body.comments.forEach((comment) =>
+					expect(comment).toMatchObject({
+						comment_id: expect.any(Number),
+						body: expect.any(String),
+						votes: expect.any(Number),
+						author: expect.any(String),
+						review_id: expect.any(Number),
+						created_at: expect.any(String),
+					})
+				);
+			});
+	});
 
+	test("GET 400 - should return error message if given an invalid id", () => {
+		return request(app)
+			.get("/api/reviews/not-a-review/comments")
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+			});
+	});
+	test("GET 404 - should return error if given valid id that doesn't exist", () => {
+		return request(app)
+			.get("/api/reviews/9999/comments")
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that review does not exist");
+			});
+	});
 });

@@ -5,11 +5,13 @@ const { getCategories } = require("./controllers/categories.controllers");
 const {
 	getReviews,
 	getReviewByID,
+	getComments,
 } = require("./controllers/reviews.controllers");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
 app.get("/api/reviews/:review_id", getReviewByID);
+app.get("/api/reviews/:review_id/comments", getComments);
 
 //error handling
 const {
