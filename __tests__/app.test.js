@@ -139,3 +139,51 @@ describe("/api/reviews/:review_id/comments", () => {
 			});
 	});
 });
+describe("/api/reviews/:review_id/comments", () => {
+	test("POST 201 - should respond with newly created comment", () => {
+		const newComment = {
+			author: "dav3rid",
+			body: "awesome game!",
+		};
+
+		return request(app)
+			.post("/api/reviews/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then((res) => {
+				expect(res.body.comment).toEqual({
+					comment_id: 7,
+					review_id: 1,
+					votes: 0,
+					created_at: expect.any(String),
+					...newComment,
+				});
+			});
+	});
+	test("GET 400 - should return error message if given an invalid id", () => {
+		const newComment = {
+			author: "dav3rid",
+			body: "awesome game!",
+		};
+		return request(app)
+			.post("/api/reviews/not-a-review/comments")
+			.send(newComment)
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+			});
+	});
+	test("GET 404 - should return error if given valid id that doesn't exist", () => {
+		const newComment = {
+			author: "dav3rid",
+			body: "awesome game!",
+		};
+		return request(app)
+			.post("/api/reviews/9999/comments")
+			.send(newComment)
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that review does not exist");
+			});
+	});
+});

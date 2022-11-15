@@ -1,17 +1,20 @@
 const express = require("express");
 const app = express();
-
+app.use(express.json());
 const { getCategories } = require("./controllers/categories.controllers");
 const {
 	getReviews,
 	getReviewByID,
 	getComments,
+	postReviewComment,
 } = require("./controllers/reviews.controllers");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
 app.get("/api/reviews/:review_id", getReviewByID);
 app.get("/api/reviews/:review_id/comments", getComments);
+
+app.post("/api/reviews/:review_id/comments", postReviewComment);
 
 //error handling
 const {

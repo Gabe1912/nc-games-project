@@ -27,7 +27,7 @@ exports.selectReviewByID = (review_id) => {
 	return db
 		.query(
 			`SELECT * FROM reviews
-        WHERE review_id = $1`,
+        WHERE review_id = $1;`,
 			[review_id]
 		)
 		.then((review) => {
@@ -47,9 +47,32 @@ exports.selectComments = (review_id) => {
 		return db
 			.query(
 				`SELECT * FROM comments
-        WHERE review_id = $1`,
+        WHERE review_id = $1;`,
 				[review_id]
 			)
 			.then((comments) => comments.rows);
+	});
+};
+
+exports.insertReviewComment = (review_id, newComment) => {
+	const { author, body } = newComment;
+	const newDate = new Date();
+	if (review_id === undefined) {
+		return Promise.reject({
+			status: 400,
+			msg: `Sorry, that's a bad request`,
+		});
+	}
+	return checkReviewExists(review_id).then(() => {
+		return db
+			.query(
+				`INSERT INTO comments
+        (author, body, review_id, votes, created_at)
+        VALUES
+        ($1, $2, $3, 0, $4)
+        RETURNING *;`,
+				[author, body, review_id, newDate]
+			)
+			.then((result) => result.rows[0]);
 	});
 };
