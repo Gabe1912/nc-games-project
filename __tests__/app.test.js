@@ -42,7 +42,7 @@ describe("/api/categories", () => {
 	});
 });
 describe("/api/reviews", () => {
-	test("GET 200 - should return with all the reviews", () => {
+	test("GET 200 - should return with all the reviews in decending order of date", () => {
 		return request(app)
 			.get("/api/reviews/")
 			.expect(200)
@@ -66,42 +66,5 @@ describe("/api/reviews", () => {
 				});
 			});
 	});
-});
-describe("/api/reviews/:review_id", () => {
-	test("GET 200 - should return an object of the relevant ", () => {
-		const output = {
-			review_id: 1,
-			title: "Agricola",
-			designer: "Uwe Rosenberg",
-			owner: "mallionaire",
-			review_img_url:
-				"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-			review_body: "Farmyard fun!",
-			category: "euro game",
-			created_at: "2021-01-18T10:00:20.514Z",
-			votes: 1,
-		};
-		return request(app)
-			.get("/api/reviews/1")
-			.expect(200)
-			.then((result) => {
-				expect(result.body).toEqual({ review: output });
-			});
-	});
-	test("GET 404 - should return error if given valid id that doesn't exist", () => {
-		return request(app)
-			.get("/api/reviews/9999")
-			.expect(404)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that review does not exist");
-			});
-	});
-	test("GET 400 - should return error message if given an invalid id", () => {
-		return request(app)
-			.get("/api/reviews/not-a-review")
-			.expect(400)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
-			});
-	});
+
 });
