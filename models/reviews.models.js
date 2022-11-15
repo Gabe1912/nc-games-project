@@ -18,3 +18,7 @@ exports.selectReviews = () => {
 		)
 		.then((reviews) => reviews.rows);
 };
+
+exports.selectReviewsByID = (review_id) => {
+	return db.query().then((review) => review.rows[0]);
+};

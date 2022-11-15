@@ -6,6 +6,7 @@ const { getReviews } = require("./controllers/reviews.controllers");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
+app.get("/api/reviews/:review_id", getReviewsByID);
 
 //error handling
 
