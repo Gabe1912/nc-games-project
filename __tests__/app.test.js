@@ -159,6 +159,30 @@ describe("/api/reviews/:review_id", () => {
 					expect(result.body.msg).toBe("Sorry, that's a bad request");
 				});
 		});
+		test("ERROR 400 - should return error if given an empty body", () => {
+			const update = {};
+			return request(app)
+				.patch("/api/reviews/1")
+				.send(update)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 400 - should return error if body is an incorrect data type", () => {
+			const update = { inc_votes: "hello world" };
+			return request(app)
+				.patch("/api/reviews/1")
+				.send(update)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
 		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
 			const update = { inc_votes: 3 };
 			return request(app)
@@ -166,7 +190,7 @@ describe("/api/reviews/:review_id", () => {
 				.send(update)
 				.expect(404)
 				.then((result) => {
-					expect(result.body.msg).toBe("Sorry, that review does not exist");
+					expect(result.body.msg).toBe("Sorry, 9999 is not a valid review_id");
 				});
 		});
 	});
@@ -199,6 +223,7 @@ describe("/api/reviews/:review_id/comments", () => {
 					expect(result.body.msg).toBe("Sorry, that's a bad request");
 				});
 		});
+
 		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
 			return request(app)
 				.get("/api/reviews/9999/comments")
