@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-const { checkReviewExists } = require("../utils");
+const { checkExists } = require("../utils");
 
 exports.selectReviews = () => {
 	return db
@@ -43,7 +43,7 @@ exports.selectReviewByID = (review_id) => {
 };
 
 exports.selectComments = (review_id) => {
-	return checkReviewExists(review_id).then(() => {
+	return checkExists("reviews", "review_id", review_id).then(() => {
 		return db
 			.query(
 				`SELECT * FROM comments
@@ -56,23 +56,26 @@ exports.selectComments = (review_id) => {
 
 exports.insertReviewComment = (review_id, newComment) => {
 	const { author, body } = newComment;
-	const newDate = new Date();
+
 	if (review_id === undefined) {
 		return Promise.reject({
 			status: 400,
 			msg: `Sorry, that's a bad request`,
 		});
 	}
-	return checkReviewExists(review_id).then(() => {
-		return db
-			.query(
-				`INSERT INTO comments
-        (author, body, review_id, votes, created_at)
+
+	return checkExists("users", "username", newComment.author).then(() => {
+		return checkExists("reviews", "review_id", review_id).then(() => {
+			return db
+				.query(
+					`INSERT INTO comments
+        (author, body, review_id)
         VALUES
-        ($1, $2, $3, 0, $4)
+        ($1, $2, $3)
         RETURNING *;`,
-				[author, body, review_id, newDate]
-			)
-			.then((result) => result.rows[0]);
+					[author, body, review_id]
+				)
+				.then((result) => result.rows[0]);
+		});
 	});
 };

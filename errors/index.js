@@ -6,7 +6,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePsqlErrors = (err, req, res, next) => {
 	if (err.code === "22P02") {
-		res.status(400).send({ msg: "Sorry, that isn't a valid id" });
+		res.status(400).send({ msg: "Sorry, that's a bad request" });
 	} else next(err);
 };
 
