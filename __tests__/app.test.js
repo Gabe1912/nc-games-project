@@ -12,7 +12,7 @@ afterAll(() => {
 });
 
 describe("/api/", () => {
-	test("GET 404 - route not found", () => {
+	test("ERROR 404 - route not found", () => {
 		return request(app)
 			.get("/api/notValidRoute")
 			.expect(404)
@@ -86,15 +86,15 @@ describe("/api/reviews/:review_id", () => {
 				});
 			});
 	});
-	test("GET 400 - should return error message if given an invalid id", () => {
+	test("ERROR 400 - should return error message if given an invalid id", () => {
 		return request(app)
 			.get("/api/reviews/not-a-review")
 			.expect(400)
 			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
+				expect(result.body.msg).toBe("Sorry, that's a bad request");
 			});
 	});
-	test("GET 404 - should return error if given valid id that doesn't exist", () => {
+	test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
 		return request(app)
 			.get("/api/reviews/9999")
 			.expect(404)
@@ -104,38 +104,128 @@ describe("/api/reviews/:review_id", () => {
 	});
 });
 describe("/api/reviews/:review_id/comments", () => {
-	test("GET 200 - should return an object of the relevant review's comments", () => {
-		return request(app)
-			.get("/api/reviews/2/comments")
-			.expect(200)
-			.then((result) => {
-				result.body.comments.forEach((comment) =>
-					expect(comment).toMatchObject({
-						comment_id: expect.any(Number),
-						body: expect.any(String),
-						votes: expect.any(Number),
-						author: expect.any(String),
-						review_id: expect.any(Number),
-						created_at: expect.any(String),
-					})
-				);
-			});
+	describe("GET /api/reviews/:review_id/comments", () => {
+		test("GET 200 - should return an object of the relevant review's comments", () => {
+			return request(app)
+				.get("/api/reviews/2/comments")
+				.expect(200)
+				.then((result) => {
+					result.body.comments.forEach((comment) =>
+						expect(comment).toMatchObject({
+							comment_id: expect.any(Number),
+							body: expect.any(String),
+							votes: expect.any(Number),
+							author: expect.any(String),
+							review_id: expect.any(Number),
+							created_at: expect.any(String),
+						})
+					);
+				});
+		});
+
+		test("ERROR 400 - should return error message if given an invalid id", () => {
+			return request(app)
+				.get("/api/reviews/not-a-review/comments")
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that's a bad request");
+				});
+		});
+		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
+			return request(app)
+				.get("/api/reviews/9999/comments")
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, 9999 is not a valid review_id");
+				});
+		});
 	});
 
-	test("GET 400 - should return error message if given an invalid id", () => {
-		return request(app)
-			.get("/api/reviews/not-a-review/comments")
-			.expect(400)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that isn't a valid id");
-			});
-	});
-	test("GET 404 - should return error if given valid id that doesn't exist", () => {
-		return request(app)
-			.get("/api/reviews/9999/comments")
-			.expect(404)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that review does not exist");
-			});
+	describe("POST /api/reviews/:review_id/comments", () => {
+		test("POST 201 - should respond with newly created comment", () => {
+			const newComment = {
+				author: "dav3rid",
+				body: "awesome game!",
+			};
+
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(201)
+				.then((res) => {
+					expect(res.body.comment).toEqual({
+						comment_id: 7,
+						review_id: 1,
+						votes: 0,
+						created_at: expect.any(String),
+						...newComment,
+					});
+				});
+		});
+		test("ERROR 400 - should return error message if given an invalid id", () => {
+			const newComment = {
+				author: "dav3rid",
+				body: "awesome game!",
+			};
+			return request(app)
+				.post("/api/reviews/not-a-review/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that's a bad request");
+				});
+		});
+		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
+			const newComment = {
+				author: "dav3rid",
+				body: "awesome game!",
+			};
+			return request(app)
+				.post("/api/reviews/9999/comments")
+				.send(newComment)
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, 9999 is not a valid review_id");
+				});
+		});
+		test("ERROR 404 - should return error if given invalid username", () => {
+			const newComment = {
+				author: "gabe",
+				body: "awesome game!",
+			};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, gabe is not a valid username");
+				});
+		});
+		test("ERROR 400 - should return error if given an empty body", () => {
+			const newComment = {};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 400 - should return error if body is an inncorrect data type", () => {
+			const newComment = {
+				author: 4,
+			};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
 	});
 });
