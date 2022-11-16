@@ -56,7 +56,12 @@ exports.selectComments = (review_id) => {
 
 exports.insertReviewComment = (review_id, newComment) => {
 	const { author, body } = newComment;
-
+	if (typeof author !== "string" || typeof body !== "string") {
+		return Promise.reject({
+			status: 400,
+			msg: "Sorry, you inputted something incorrectly",
+		});
+	}
 	if (review_id === undefined) {
 		return Promise.reject({
 			status: 400,
@@ -64,7 +69,7 @@ exports.insertReviewComment = (review_id, newComment) => {
 		});
 	}
 
-	return checkExists("users", "username", newComment.author).then(() => {
+	return checkExists("users", "username", author).then(() => {
 		return checkExists("reviews", "review_id", review_id).then(() => {
 			return db
 				.query(
@@ -75,7 +80,9 @@ exports.insertReviewComment = (review_id, newComment) => {
         RETURNING *;`,
 					[author, body, review_id]
 				)
-				.then((result) => result.rows[0]);
+				.then((result) => {
+					return result.rows[0];
+				});
 		});
 	});
 };

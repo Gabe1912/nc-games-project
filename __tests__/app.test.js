@@ -201,14 +201,30 @@ describe("/api/reviews/:review_id/comments", () => {
 					expect(result.body.msg).toBe("Sorry, gabe is not a valid username");
 				});
 		});
-		test("ERROR 404- should return error if given an empty body", () => {
+		test("ERROR 400 - should return error if given an empty body", () => {
 			const newComment = {};
 			return request(app)
 				.post("/api/reviews/1/comments")
 				.send(newComment)
-				.expect(404)
+				.expect(400)
 				.then((result) => {
-					expect(result.body.msg).toBe("Sorry, you didn't input anything");
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 400 - should return error if body is an inncorrect data type", () => {
+			const newComment = {
+				author: 4,
+			};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
 				});
 		});
 	});

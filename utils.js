@@ -2,12 +2,6 @@ const db = require("./db/connection");
 const format = require("pg-format");
 
 exports.checkExists = (table, column, value) => {
-	if (value === undefined) {
-		return Promise.reject({
-			status: 404,
-			msg: `Sorry, you didn't input anything`,
-		});
-	}
 	const queryStr = format(
 		"SELECT * FROM %I WHERE %I = %L;",
 		table,
