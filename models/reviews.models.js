@@ -86,3 +86,30 @@ exports.insertReviewComment = (review_id, newComment) => {
 		});
 	});
 };
+
+exports.updateReviewById = (review_id, change) => {
+	if (review_id === undefined) {
+		return Promise.reject({
+			status: 400,
+			msg: `Sorry, that's a bad request`,
+		});
+	}
+	const { inc_votes: newVote } = change;
+	return db
+		.query(
+			`UPDATE reviews
+            SET votes = votes + $1
+            WHERE review_id = $2 RETURNING *;`,
+			[newVote, review_id]
+		)
+		.then((review) => {
+			const result = review.rows[0];
+			if (result === undefined) {
+				return Promise.reject({
+					status: 404,
+					msg: `Sorry, that review does not exist`,
+				});
+			}
+			return result;
+		});
+};

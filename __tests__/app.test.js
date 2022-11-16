@@ -66,41 +66,109 @@ describe("/api/reviews", () => {
 	});
 });
 describe("/api/reviews/:review_id", () => {
-	test("GET 200 - should return an object of the relevant review", () => {
-		return request(app)
-			.get("/api/reviews/1")
-			.expect(200)
-			.then((result) => {
-				expect(result.body).toMatchObject({
-					review: {
-						review_id: expect.any(Number),
-						title: expect.any(String),
-						designer: expect.any(String),
-						owner: expect.any(String),
-						review_img_url: expect.any(String),
-						review_body: expect.any(String),
-						category: expect.any(String),
-						created_at: expect.any(String),
-						votes: expect.any(Number),
-					},
+	describe("GET /api/reviews/:review_id", () => {
+		test("GET 200 - should return an object of the relevant review", () => {
+			return request(app)
+				.get("/api/reviews/1")
+				.expect(200)
+				.then((result) => {
+					expect(result.body).toMatchObject({
+						review: {
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							review_body: expect.any(String),
+							category: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+						},
+					});
 				});
-			});
+		});
+		test("ERROR 400 - should return error message if given an invalid id", () => {
+			return request(app)
+				.get("/api/reviews/not-a-review")
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that's a bad request");
+				});
+		});
+		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
+			return request(app)
+				.get("/api/reviews/9999")
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that review does not exist");
+				});
+		});
 	});
-	test("ERROR 400 - should return error message if given an invalid id", () => {
-		return request(app)
-			.get("/api/reviews/not-a-review")
-			.expect(400)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that's a bad request");
-			});
-	});
-	test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
-		return request(app)
-			.get("/api/reviews/9999")
-			.expect(404)
-			.then((result) => {
-				expect(result.body.msg).toBe("Sorry, that review does not exist");
-			});
+	describe("PATCH /api/reviews/:review_id", () => {
+		test("PATCH - 200: should update the votes of a review by increasing by passed value", () => {
+			const update = { inc_votes: 3 };
+			const output = {
+				review_id: 1,
+				title: "Agricola",
+				designer: "Uwe Rosenberg",
+				owner: "mallionaire",
+				review_img_url:
+					"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+				review_body: "Farmyard fun!",
+				category: "euro game",
+				created_at: "2021-01-18T10:00:20.514Z",
+				votes: 4,
+			};
+			return request(app)
+				.patch("/api/reviews/1")
+				.send(update)
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.review).toEqual(output);
+				});
+		});
+		test("PATCH - 200: should update the votes of a review by decreasing by passed value", () => {
+			const update = { inc_votes: -3 };
+			const output = {
+				review_id: 2,
+				title: "Jenga",
+				designer: "Leslie Scott",
+				owner: "philippaclaire9",
+				review_img_url:
+					"https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+				review_body: "Fiddly fun for all the family",
+				category: "dexterity",
+				created_at: "2021-01-18T10:01:41.251Z",
+				votes: 2,
+			};
+			return request(app)
+				.patch("/api/reviews/2")
+				.send(update)
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.review).toEqual(output);
+				});
+		});
+		test("ERROR 400 - should return error message if given an invalid id", () => {
+			const update = { inc_votes: 3 };
+			return request(app)
+				.patch("/api/reviews/not-a-review")
+				.send(update)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that's a bad request");
+				});
+		});
+		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
+			const update = { inc_votes: 3 };
+			return request(app)
+				.patch("/api/reviews/9999")
+				.send(update)
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe("Sorry, that review does not exist");
+				});
+		});
 	});
 });
 describe("/api/reviews/:review_id/comments", () => {
