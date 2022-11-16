@@ -175,6 +175,33 @@ describe("/api/reviews/:review_id/comments", () => {
 					expect(result.body.msg).toBe("Sorry, that's a bad request");
 				});
 		});
+		test("ERROR 400 - should return error if given an empty body", () => {
+			const newComment = {};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 400 - should return error if body is an incorrect data type", () => {
+			const newComment = {
+				author: 4,
+				body: 7,
+			};
+			return request(app)
+				.post("/api/reviews/1/comments")
+				.send(newComment)
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
 		test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
 			const newComment = {
 				author: "dav3rid",
@@ -199,32 +226,6 @@ describe("/api/reviews/:review_id/comments", () => {
 				.expect(404)
 				.then((result) => {
 					expect(result.body.msg).toBe("Sorry, gabe is not a valid username");
-				});
-		});
-		test("ERROR 400 - should return error if given an empty body", () => {
-			const newComment = {};
-			return request(app)
-				.post("/api/reviews/1/comments")
-				.send(newComment)
-				.expect(400)
-				.then((result) => {
-					expect(result.body.msg).toBe(
-						"Sorry, you inputted something incorrectly"
-					);
-				});
-		});
-		test("ERROR 400 - should return error if body is an inncorrect data type", () => {
-			const newComment = {
-				author: 4,
-			};
-			return request(app)
-				.post("/api/reviews/1/comments")
-				.send(newComment)
-				.expect(400)
-				.then((result) => {
-					expect(result.body.msg).toBe(
-						"Sorry, you inputted something incorrectly"
-					);
 				});
 		});
 	});
