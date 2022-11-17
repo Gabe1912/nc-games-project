@@ -26,8 +26,15 @@ exports.selectReviewByID = (review_id) => {
 	}
 	return db
 		.query(
-			`SELECT * FROM reviews
-        WHERE review_id = $1;`,
+			`SELECT reviews.owner, reviews.title, reviews.review_id,
+            reviews.category, reviews.review_img_url, reviews.review_body,
+            reviews.created_at, reviews.votes,
+            reviews.designer, COUNT(comments.review_id) ::INT AS comment_count
+            FROM reviews
+            LEFT JOIN comments
+            ON  reviews.review_id = comments.review_id
+        	WHERE reviews.review_id = $1
+			GROUP BY reviews.review_id;`,
 			[review_id]
 		)
 		.then((review) => {
