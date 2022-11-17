@@ -83,6 +83,26 @@ describe("/api/reviews/:review_id", () => {
 							category: expect.any(String),
 							created_at: expect.any(String),
 							votes: expect.any(Number),
+						},
+					});
+				});
+		});
+		test("GET 200 - should return an object of the relevant review including a comment_count column", () => {
+			return request(app)
+				.get("/api/reviews/1")
+				.expect(200)
+				.then((result) => {
+					expect(result.body).toMatchObject({
+						review: {
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							review_body: expect.any(String),
+							category: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
 							comment_count: expect.any(Number),
 						},
 					});
