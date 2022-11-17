@@ -9,15 +9,15 @@ const {
 	postReviewComment,
 	patchReviewById,
 } = require("./controllers/reviews.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
 app.get("/api/reviews/:review_id", getReviewByID);
 app.get("/api/reviews/:review_id/comments", getComments);
-
 app.post("/api/reviews/:review_id/comments", postReviewComment);
-
 app.patch("/api/reviews/:review_id", patchReviewById);
+app.get("/api/users/", getUsers);
 
 //error handling
 const {
