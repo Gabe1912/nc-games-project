@@ -185,7 +185,6 @@ describe("/api/reviews", () => {
 		});
 	});
 });
-
 describe("/api/reviews/:review_id", () => {
 	describe("GET /api/reviews/:review_id", () => {
 		test("GET 200 - should return an object of the relevant review", () => {
@@ -478,6 +477,27 @@ describe("/api/users", () => {
 						avatar_url: expect.any(String),
 					});
 				});
+			});
+	});
+});
+describe("/api/comments/:comment_id", () => {
+	test("DELETE - 204: should remove a comment from the database", () => {
+		return request(app).delete("/api/comments/1").expect(204);
+	});
+	test("ERROR 400 - should return error message if given an invalid id", () => {
+		return request(app)
+			.delete("/api/comments/not-a-comment")
+			.expect(400)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that's a bad request");
+			});
+	});
+	test("ERROR 404 - should return error if given valid id that doesn't exist", () => {
+		return request(app)
+			.delete("/api/comments/9999/")
+			.expect(404)
+			.then((result) => {
+				expect(result.body.msg).toBe("Sorry, that comment does not exist");
 			});
 	});
 });
