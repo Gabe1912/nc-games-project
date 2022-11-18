@@ -12,6 +12,7 @@ const {
 } = require("./controllers/reviews.controllers");
 const { getUsers } = require("./controllers/users.controllers");
 const { deleteCommentById } = require("./controllers/comments.controllers");
+const endpoints = require("./endpoints.json");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
@@ -21,6 +22,14 @@ app.post("/api/reviews/:review_id/comments", postReviewComment);
 app.patch("/api/reviews/:review_id", patchReviewById);
 app.get("/api/users/", getUsers);
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api/", (req, res) => {
+	if (endpoints === undefined) {
+		res.status(404).send({ msg: "file not found :(" });
+	}
+	res.status(200).send(endpoints);
+});
+
 //error handling
 const {
 	handleCustomErrors,

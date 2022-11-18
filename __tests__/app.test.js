@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
+const endpointsTest = require("../endpoints.json");
 
 beforeEach(() => {
 	return seed(data);
@@ -12,6 +13,14 @@ afterAll(() => {
 });
 
 describe("/api/", () => {
+	test("GET 200 - should give a 200 code and return the endpoints.js file", () => {
+		return request(app)
+			.get("/api/")
+			.expect(200)
+			.then((res) => {
+				expect(res.body).toMatchObject(endpointsTest);
+			});
+	});
 	test("ERROR 404 - route not found", () => {
 		return request(app)
 			.get("/api/notValidRoute")
