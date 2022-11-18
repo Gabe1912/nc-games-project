@@ -40,31 +40,152 @@ describe("/api/categories", () => {
 	});
 });
 describe("/api/reviews", () => {
-	test("GET 200 - should return with all the reviews in decending order of date", () => {
-		return request(app)
-			.get("/api/reviews/")
-			.expect(200)
-			.then((result) => {
-				expect(result.body.reviews.length > 0).toBe(true);
-				expect(result.body.reviews).toBeSortedBy("created_at", {
-					descending: true,
-				});
-				result.body.reviews.forEach((review) => {
-					expect(review).toMatchObject({
-						owner: expect.any(String),
-						title: expect.any(String),
-						review_id: expect.any(Number),
-						category: expect.any(String),
-						review_img_url: expect.any(String),
-						created_at: expect.any(String),
-						votes: expect.any(Number),
-						designer: expect.any(String),
-						comment_count: expect.any(Number),
+	describe("/api/reviews/", () => {
+		test("GET 200 - should return with all the reviews in decending order of date", () => {
+			return request(app)
+				.get("/api/reviews/")
+				.expect(200)
+				.then((result) => {
+					expect(result.body.reviews.length > 0).toBe(true);
+					expect(result.body.reviews).toBeSortedBy("created_at", {
+						descending: true,
+					});
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							owner: expect.any(String),
+							title: expect.any(String),
+							review_id: expect.any(Number),
+							category: expect.any(String),
+							review_img_url: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							designer: expect.any(String),
+							comment_count: expect.any(Number),
+						});
 					});
 				});
-			});
+		});
+	});
+	describe("/api/reviews?", () => {
+		test("GET 200 - should return an object of the relevant reviews where the category is euro game", () => {
+			return request(app)
+				.get("/api/reviews?category=euro game")
+				.expect(200)
+				.then((result) => {
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							category: "euro game",
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test("GET 200 - should return an object of the relevant reviews where the category is children's games", () => {
+			return request(app)
+				.get("/api/reviews?category=children's games")
+				.expect(200)
+				.then((result) => {
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							category: "euro game",
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test("GET 200 - should return an object of reviews sorted by title in descending order (default)", () => {
+			return request(app)
+				.get("/api/reviews?sort_by=title")
+				.expect(200)
+				.then((result) => {
+					expect(result.body.reviews).toBeSortedBy("title", {
+						descending: true,
+					});
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							category: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test("GET 200 - should return an object of reviews sorted by date (default) in ascending order", () => {
+			return request(app)
+				.get("/api/reviews?order=asc")
+				.expect(200)
+				.then((result) => {
+					expect(result.body.reviews).toBeSortedBy("created_at", {
+						ascending: true,
+					});
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							category: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
+		test("ERROR 400 - should return an error if given an incorrect order", () => {
+			return request(app)
+				.get("/api/reviews?order=bob")
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 400 - should return error if given a sort_by column that doesn't exist", () => {
+			return request(app)
+				.get("/api/reviews?sort_by=fred")
+				.expect(400)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 404 - should return error if given valid category that doesn't exist", () => {
+			return request(app)
+				.get("/api/reviews?category=bananas")
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, bananas is not a valid category"
+					);
+				});
+		});
 	});
 });
+
 describe("/api/reviews/:review_id", () => {
 	describe("GET /api/reviews/:review_id", () => {
 		test("GET 200 - should return an object of the relevant review", () => {

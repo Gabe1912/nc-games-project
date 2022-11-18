@@ -8,6 +8,7 @@ const {
 	getComments,
 	postReviewComment,
 	patchReviewById,
+	getReviewByCategory,
 } = require("./controllers/reviews.controllers");
 const { getUsers } = require("./controllers/users.controllers");
 
