@@ -55,7 +55,7 @@ There a handfull of dependencies and dev dependencies that this repo relies on:
 You can install of these dependencies by copying and pasting this command into your command line while in the repo's root directory:
 
 ```
-npm i && npm i dotenv  && npm i express && npm i jest-sorted && npm i pg && npm i pg-format && npm i supertest
+npm i
 ```
 
 ### Seeding the Local Database
