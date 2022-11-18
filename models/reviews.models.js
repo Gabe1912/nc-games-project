@@ -9,7 +9,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
 			msg: "Sorry, you inputted something incorrectly",
 		});
 	}
-	const categories = [
+	const columns = [
 		"title",
 		"designer",
 		"owner",
@@ -18,9 +18,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
 		"created_at",
 		"votes",
 	];
-	console.log(categories);
-	if (!categories.includes(sort_by)) {
-		console.log("rejecting promise");
+	if (!columns.includes(sort_by)) {
 		return Promise.reject({
 			status: 400,
 			msg: `Sorry, you inputted something incorrectly`,
@@ -36,13 +34,27 @@ exports.selectReviews = (category, sort_by = "created_at", order = "desc") => {
             ON  reviews.review_id = comments.review_id
             `;
 	let queryParams = [];
+	let validCategories = [];
 
-	if (category) {
-		queryStr += ` WHERE reviews.category = $1`;
-		queryParams.push(category);
-	}
-	queryStr += `GROUP BY reviews.review_id ORDER BY ${sort_by} ${order};`;
-	return db.query(queryStr, queryParams).then((reviews) => reviews.rows);
+	return getValues("categories", "slug")
+		.then((result) => {
+			validCategories = result;
+		})
+		.then(() => {
+			if (category) {
+				if (!validCategories.includes(category)) {
+					return Promise.reject({
+						status: 404,
+						msg: `Sorry, ${category} is not a valid category`,
+					});
+				}
+				queryStr += ` WHERE reviews.category = $1`;
+				queryParams.push(category);
+			}
+			queryStr += `GROUP BY reviews.review_id ORDER BY ${sort_by} ${order};`;
+			return db.query(queryStr, queryParams);
+		})
+		.then((reviews) => reviews.rows);
 };
 
 exports.selectReviewByID = (review_id) => {

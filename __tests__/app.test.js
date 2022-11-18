@@ -87,6 +87,26 @@ describe("/api/reviews", () => {
 					});
 				});
 		});
+		test("GET 200 - should return an object of the relevant reviews where the category is children's games", () => {
+			return request(app)
+				.get("/api/reviews?category=children's games")
+				.expect(200)
+				.then((result) => {
+					result.body.reviews.forEach((review) => {
+						expect(review).toMatchObject({
+							review_id: expect.any(Number),
+							title: expect.any(String),
+							designer: expect.any(String),
+							owner: expect.any(String),
+							review_img_url: expect.any(String),
+							category: "euro game",
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						});
+					});
+				});
+		});
 		test("GET 200 - should return an object of reviews sorted by title in descending order (default)", () => {
 			return request(app)
 				.get("/api/reviews?sort_by=title")
@@ -143,13 +163,23 @@ describe("/api/reviews", () => {
 					);
 				});
 		});
-		test("ERROR 400 - should return error if given a sort_by category that doesn't exist", () => {
+		test("ERROR 400 - should return error if given a sort_by column that doesn't exist", () => {
 			return request(app)
 				.get("/api/reviews?sort_by=fred")
 				.expect(400)
 				.then((result) => {
 					expect(result.body.msg).toBe(
 						"Sorry, you inputted something incorrectly"
+					);
+				});
+		});
+		test("ERROR 404 - should return error if given valid category that doesn't exist", () => {
+			return request(app)
+				.get("/api/reviews?category=bananas")
+				.expect(404)
+				.then((result) => {
+					expect(result.body.msg).toBe(
+						"Sorry, bananas is not a valid category"
 					);
 				});
 		});
