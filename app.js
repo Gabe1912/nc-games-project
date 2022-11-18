@@ -11,6 +11,7 @@ const {
 	getReviewByCategory,
 } = require("./controllers/reviews.controllers");
 const { getUsers } = require("./controllers/users.controllers");
+const { deleteCommentById } = require("./controllers/comments.controllers");
 
 app.get("/api/categories/", getCategories);
 app.get("/api/reviews/", getReviews);
@@ -19,7 +20,7 @@ app.get("/api/reviews/:review_id/comments", getComments);
 app.post("/api/reviews/:review_id/comments", postReviewComment);
 app.patch("/api/reviews/:review_id", patchReviewById);
 app.get("/api/users/", getUsers);
-
+app.delete("/api/comments/:comment_id", deleteCommentById);
 //error handling
 const {
 	handleCustomErrors,
