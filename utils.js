@@ -17,3 +17,13 @@ exports.checkExists = (table, column, value) => {
 		}
 	});
 };
+
+exports.getValues = (table, column) => {
+	let output = [];
+	return db.query(`SELECT ${column} FROM ${table}`).then((results) => {
+		for (let i = 0; i < results.rows.length; i++) {
+			output.push(Object.values(results.rows[i])[0]);
+		}
+		return output;
+	});
+};
