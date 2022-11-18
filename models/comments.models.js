@@ -19,6 +19,6 @@ exports.removeCommentById = (comment_id) => {
 					msg: `Sorry, that comment does not exist`,
 				});
 			}
-			return result;
+			// return result;
 		});
 };
